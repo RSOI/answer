@@ -1,0 +1,494 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/RSOI/answer/controller/answer.go (87.5%)</option>
+				
+				<option value="file1">github.com/RSOI/answer/controller/controller.go (0.0%)</option>
+				
+				<option value="file2">github.com/RSOI/answer/controller/get.go (90.0%)</option>
+				
+				<option value="file3">github.com/RSOI/answer/controller/remove.go (89.5%)</option>
+				
+				<option value="file4">github.com/RSOI/answer/controller/servicestat.go (0.0%)</option>
+				
+				<option value="file5">github.com/RSOI/answer/controller/update.go (100.0%)</option>
+				
+				<option value="file6">github.com/RSOI/answer/main.go (0.0%)</option>
+				
+				<option value="file7">github.com/RSOI/answer/routing.go (88.2%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package controller
+
+import (
+        "encoding/json"
+        "fmt"
+
+        "github.com/RSOI/answer/model"
+        "github.com/RSOI/answer/utils"
+        "github.com/RSOI/answer/view"
+)
+
+// AnswerPUT new answer
+func AnswerPUT(body []byte) (*model.Answer, error) <span class="cov8" title="1">{
+        var err error
+
+        var NewAnswer model.Answer
+        err = json.Unmarshal(body, &amp;NewAnswer)
+        if err != nil </span><span class="cov8" title="1">{
+                utils.LOG(fmt.Sprintf("Broken body. Error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">err = view.ValidateNewAnswer(NewAnswer)
+        if err != nil </span><span class="cov8" title="1">{
+                utils.LOG(fmt.Sprintf("Validation error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">NewAnswer, err = AnswerModel.AddAnswer(NewAnswer)
+        if err != nil </span><span class="cov0" title="0">{
+                utils.LOG(fmt.Sprintf("Data error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">utils.LOG("New answer added successfully")
+        return &amp;NewAnswer, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package controller
+
+import (
+        "github.com/RSOI/answer/model"
+        "github.com/RSOI/answer/utils"
+        "github.com/jackc/pgx"
+)
+
+var (
+        // AnswerModel interface with methods
+        AnswerModel model.AServiceInterface
+)
+
+// Init Init model with pgx connection
+func Init(db *pgx.ConnPool) <span class="cov0" title="0">{
+        utils.LOG("Setup model...")
+        AnswerModel = &amp;model.AService{
+                Conn: db,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package controller
+
+import (
+        "fmt"
+        "strconv"
+
+        "github.com/RSOI/answer/model"
+        "github.com/RSOI/answer/utils"
+)
+
+// AnswerGET get answer by id
+func AnswerGET(id string) (*model.Answer, error) <span class="cov8" title="1">{
+        aID, _ := strconv.Atoi(id)
+
+        data, err := AnswerModel.GetAnswerByID(aID)
+        if err != nil </span><span class="cov8" title="1">{
+                utils.LOG(fmt.Sprintf("Data error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">utils.LOG("Answer was found successfully")
+        return &amp;data, nil</span>
+}
+
+// AnswersGET get answers by author or question
+func AnswersGET(aid string, searchby string) ([]model.Answer, error) <span class="cov8" title="1">{
+        var err error
+        var data []model.Answer
+
+        aidi, _ := strconv.Atoi(aid)
+        switch searchby </span>{
+        case "author":<span class="cov8" title="1">
+                data, err = AnswerModel.GetAnswersByAuthorID(aidi)
+                break</span>
+        case "question":<span class="cov8" title="1">
+                data, err = AnswerModel.GetAnswersByQuestionID(aidi)
+                break</span>
+        }
+
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                utils.LOG(fmt.Sprintf("Data error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">utils.LOG("Answers were found successfully")
+        return data, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package controller
+
+import (
+        "encoding/json"
+        "fmt"
+
+        "github.com/RSOI/answer/model"
+        "github.com/RSOI/answer/utils"
+        "github.com/RSOI/answer/view"
+)
+
+// RemoveDELETE remove answer
+func RemoveDELETE(body []byte) error <span class="cov8" title="1">{
+        var err error
+
+        var AnswerToRemove model.Answer
+        err = json.Unmarshal(body, &amp;AnswerToRemove)
+        if err != nil </span><span class="cov0" title="0">{
+                utils.LOG(fmt.Sprintf("Broken body. Error: %s", err.Error()))
+                return err
+        }</span>
+
+        <span class="cov8" title="1">f, err := view.ValidateDeleteAnswer(AnswerToRemove)
+        if err != nil </span><span class="cov8" title="1">{
+                utils.LOG(fmt.Sprintf("Validation error: %s", err.Error()))
+                return err
+        }</span>
+
+        <span class="cov8" title="1">utils.LOG(fmt.Sprintf("Removing answer by: %s...", f))
+
+        switch f </span>{
+        case "id":<span class="cov8" title="1">
+                err = AnswerModel.DeleteAnswerByID(AnswerToRemove)</span>
+        case "question_id":<span class="cov8" title="1">
+                err = AnswerModel.DeleteAnswerByQuestionID(AnswerToRemove)</span>
+        case "author_id":<span class="cov8" title="1">
+                err = AnswerModel.DeleteAnswerByAuthorID(AnswerToRemove)</span>
+        }
+
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                utils.LOG(fmt.Sprintf("Data error: %s", err.Error()))
+        }</span> else<span class="cov8" title="1"> {
+                utils.LOG("Answer removed successfully")
+        }</span>
+
+        <span class="cov8" title="1">return err</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package controller
+
+import (
+        "fmt"
+
+        "github.com/RSOI/answer/model"
+        "github.com/RSOI/answer/utils"
+)
+
+// IndexGET returns usage statistic
+func IndexGET(host []byte) (*model.ServiceStatus, error) <span class="cov0" title="0">{
+        data, err := AnswerModel.GetUsageStatistic(string(host))
+        if err != nil </span><span class="cov0" title="0">{
+                utils.LOG(fmt.Sprintf("Data error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">utils.LOG("Successfull accessing usage statistic")
+        return &amp;data, nil</span>
+}
+
+// LogStat stores service usage
+func LogStat(path []byte, status int, err string) <span class="cov0" title="0">{
+        utils.LOG("Storing usage stat...")
+        AnswerModel.LogStat(path, status, err)
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package controller
+
+import (
+        "encoding/json"
+        "fmt"
+
+        "github.com/RSOI/answer/model"
+        "github.com/RSOI/answer/utils"
+        "github.com/RSOI/answer/view"
+)
+
+// MakeBestPATCH remove answer
+func MakeBestPATCH(body []byte) (*model.Answer, error) <span class="cov8" title="1">{
+        var err error
+
+        var AnswerToUpdate model.Answer
+        var UpdatedAnswer model.Answer
+        err = json.Unmarshal(body, &amp;AnswerToUpdate)
+        if err != nil </span><span class="cov8" title="1">{
+                utils.LOG(fmt.Sprintf("Broken body. Error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">err = view.ValidateMakeBestAnswer(AnswerToUpdate)
+        if err != nil </span><span class="cov8" title="1">{
+                utils.LOG(fmt.Sprintf("Validation error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">UpdatedAnswer, err = AnswerModel.UpdateAnswer(AnswerToUpdate)
+        if err != nil </span><span class="cov8" title="1">{
+                utils.LOG(fmt.Sprintf("Data error: %s", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">utils.LOG("Answer marked as best successfully")
+        return &amp;UpdatedAnswer, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">// QUESTION SERVICE
+
+package main
+
+import (
+        "fmt"
+        "os"
+
+        "github.com/RSOI/answer/controller"
+        "github.com/RSOI/answer/database"
+        "github.com/RSOI/answer/utils"
+        "github.com/valyala/fasthttp"
+)
+
+// PORT application port
+const PORT = 8081
+
+func main() <span class="cov0" title="0">{
+        if len(os.Args) &gt; 1 </span><span class="cov0" title="0">{
+                utils.DEBUG = os.Args[1] == "debug"
+        }</span>
+        <span class="cov0" title="0">utils.LOG("Launched in debug mode...")
+        utils.LOG(fmt.Sprintf("Answer service is starting on localhost: %d", PORT))
+
+        controller.Init(database.Connect())
+        fasthttp.ListenAndServe(fmt.Sprintf(":%d", PORT), initRoutes().Handler)</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package main
+
+import (
+        "encoding/json"
+        "fmt"
+
+        "github.com/RSOI/answer/controller"
+        "github.com/RSOI/answer/ui"
+        "github.com/RSOI/answer/utils"
+        "github.com/buaazp/fasthttprouter"
+        "github.com/valyala/fasthttp"
+)
+
+func sendResponse(ctx *fasthttp.RequestCtx, r ui.Response, nolog ...bool) <span class="cov8" title="1">{
+        ctx.Response.Header.Set("Content-Type", "application/json")
+        ctx.Response.SetStatusCode(r.Status)
+        utils.LOG(fmt.Sprintf("Sending response. Status: %d", r.Status))
+
+        doLog := true
+        if len(nolog) &gt; 0 </span><span class="cov0" title="0">{
+                doLog = !nolog[0]
+        }</span>
+
+        <span class="cov8" title="1">if doLog </span><span class="cov8" title="1">{
+                controller.LogStat(ctx.Path(), r.Status, r.Error)
+        }</span>
+
+        <span class="cov8" title="1">content, _ := json.Marshal(r)
+        ctx.Write(content)</span>
+}
+
+func indexGET(ctx *fasthttp.RequestCtx) <span class="cov0" title="0">{
+        utils.LOG(fmt.Sprintf("Request: Get service stats (%s)", ctx.Path()))
+        var err error
+        var r ui.Response
+
+        r.Data, err = controller.IndexGET(ctx.Host())
+        r.Status, r.Error = ui.ErrToResponse(err)
+
+        nolog := true
+        sendResponse(ctx, r, nolog)
+}</span>
+
+func answerPUT(ctx *fasthttp.RequestCtx) <span class="cov8" title="1">{
+        utils.LOG(fmt.Sprintf("Answer question (%s)", ctx.Path()))
+        var err error
+        var r ui.Response
+
+        r.Data, err = controller.AnswerPUT(ctx.PostBody())
+        r.Status, r.Error = ui.ErrToResponse(err)
+        if r.Status == 200 </span><span class="cov8" title="1">{
+                r.Status = 201 // REST :)
+        }</span>
+        <span class="cov8" title="1">sendResponse(ctx, r)</span>
+}
+
+func answerGET(ctx *fasthttp.RequestCtx) <span class="cov8" title="1">{
+        utils.LOG(fmt.Sprintf("Get one answer (%s)", ctx.Path()))
+        var err error
+        var r ui.Response
+
+        id := ctx.UserValue("id").(string)
+        r.Data, err = controller.AnswerGET(id)
+        r.Status, r.Error = ui.ErrToResponse(err)
+        sendResponse(ctx, r)
+}</span>
+
+func answersAuthorGET(ctx *fasthttp.RequestCtx) <span class="cov8" title="1">{
+        utils.LOG(fmt.Sprintf("Request: Get answers by author id (%s)", ctx.Path()))
+        var err error
+        var r ui.Response
+
+        aid := ctx.UserValue("authorid").(string)
+        r.Data, err = controller.AnswersGET(aid, "author")
+        r.Status, r.Error = ui.ErrToResponse(err)
+        sendResponse(ctx, r)
+}</span>
+
+func answersQuestionGET(ctx *fasthttp.RequestCtx) <span class="cov8" title="1">{
+        utils.LOG(fmt.Sprintf("Request: Get answers by question id (%s)", ctx.Path()))
+        var err error
+        var r ui.Response
+
+        qid := ctx.UserValue("questionid").(string)
+        r.Data, err = controller.AnswersGET(qid, "question")
+        r.Status, r.Error = ui.ErrToResponse(err)
+        sendResponse(ctx, r)
+}</span>
+
+func makeBestPATCH(ctx *fasthttp.RequestCtx) <span class="cov8" title="1">{
+        utils.LOG(fmt.Sprintf("Request: Mark answer as best (%s)", ctx.Path()))
+        var err error
+        var r ui.Response
+
+        r.Data, err = controller.MakeBestPATCH(ctx.PostBody())
+        r.Status, r.Error = ui.ErrToResponse(err)
+        sendResponse(ctx, r)
+}</span>
+
+func removeDELETE(ctx *fasthttp.RequestCtx) <span class="cov8" title="1">{
+        utils.LOG(fmt.Sprintf("Request: Delete answer (%s)", ctx.Path()))
+        var err error
+        var r ui.Response
+
+        err = controller.RemoveDELETE(ctx.PostBody())
+        r.Status, r.Error = ui.ErrToResponse(err)
+        sendResponse(ctx, r)
+}</span>
+
+func initRoutes() *fasthttprouter.Router <span class="cov8" title="1">{
+        utils.LOG("Setup router...")
+        router := fasthttprouter.New()
+        router.GET("/", indexGET)
+        router.PUT("/answer", answerPUT)
+        router.GET("/answer/id:id", answerGET)
+        router.GET("/answers/author:authorid", answersAuthorGET)
+        router.GET("/answers/question:questionid", answersQuestionGET)
+        router.PATCH("/best", makeBestPATCH)
+        router.DELETE("/delete", removeDELETE)
+
+        return router
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
