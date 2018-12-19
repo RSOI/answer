@@ -1,0 +1,14 @@
+language: go
+go:
+- '1.11'
+sudo: true
+before_script:
+  - go get github.com/valyala/fasthttp
+  - go get github.com/jackc/pgx
+  - go get "github.com/stretchr/testify/assert"
+  - go get "github.com/stretchr/testify/mock"
+script:
+  - go build
+  - go test
+  - cd ./controller
+  - go test
