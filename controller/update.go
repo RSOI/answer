@@ -15,7 +15,9 @@ func MakeBestPATCH(body []byte) (*model.Answer, error) {
 
 	var AnswerToUpdate model.Answer
 	var UpdatedAnswer model.Answer
+	isBest := true
 	err = json.Unmarshal(body, &AnswerToUpdate)
+	AnswerToUpdate.IsBest = &isBest
 	if err != nil {
 		utils.LOG(fmt.Sprintf("Broken body. Error: %s", err.Error()))
 		return nil, err

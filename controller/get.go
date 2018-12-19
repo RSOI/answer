@@ -23,17 +23,17 @@ func AnswerGET(id string) (*model.Answer, error) {
 }
 
 // AnswersGET get answers by author or question
-func AnswersGET(aid string, searchby string) ([]model.Answer, error) {
+func AnswersGET(aid string, searchby string, limit int, offset int) ([]model.Answer, error) {
 	var err error
 	var data []model.Answer
 
 	aidi, _ := strconv.Atoi(aid)
 	switch searchby {
 	case "author":
-		data, err = AnswerModel.GetAnswersByAuthorID(aidi)
+		data, err = AnswerModel.GetAnswersByAuthorID(aidi, limit, offset)
 		break
 	case "question":
-		data, err = AnswerModel.GetAnswersByQuestionID(aidi)
+		data, err = AnswerModel.GetAnswersByQuestionID(aidi, limit, offset)
 		break
 	}
 

@@ -41,12 +41,12 @@ func (s *MockedAService) GetAnswerByID(qID int) (model.Answer, error) {
 	args := s.Mock.Called(qID)
 	return args.Get(0).(model.Answer), args.Error(1)
 }
-func (s *MockedAService) GetAnswersByAuthorID(aAuthorID int) ([]model.Answer, error) {
-	args := s.Mock.Called(aAuthorID)
+func (s *MockedAService) GetAnswersByAuthorID(aAuthorID int, limit int, offset int) ([]model.Answer, error) {
+	args := s.Mock.Called(aAuthorID, limit, offset)
 	return args.Get(0).([]model.Answer), args.Error(1)
 }
-func (s *MockedAService) GetAnswersByQuestionID(aQuestionID int) ([]model.Answer, error) {
-	args := s.Mock.Called(aQuestionID)
+func (s *MockedAService) GetAnswersByQuestionID(aQuestionID int, limit int, offset int) ([]model.Answer, error) {
+	args := s.Mock.Called(aQuestionID, limit, offset)
 	return args.Get(0).([]model.Answer), args.Error(1)
 }
 func (s *MockedAService) UpdateAnswer(a model.Answer) (model.Answer, error) {
@@ -273,7 +273,7 @@ func TestAnswerGetByAuthorIDCorrectData(t *testing.T) {
 	createdAnswers := make([]model.Answer, 0)
 	createdAnswers = append(createdAnswers, createdAnswer)
 	createdAnswers = append(createdAnswers, createdAnswer)
-	cMock.On("GetAnswersByAuthorID", 1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByAuthorID", 1, -1, -1).Return(createdAnswers, nil)
 
 	err := client.Do(req, res)
 	if assert.Nil(t, err) {
@@ -305,7 +305,7 @@ func TestAnswerGetByAuthorIDNotFound(t *testing.T) {
 	req.Header.SetMethod("GET")
 
 	createdAnswers := make([]model.Answer, 0)
-	cMock.On("GetAnswersByAuthorID", 1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByAuthorID", 1, -1, -1).Return(createdAnswers, nil)
 
 	err := client.Do(req, res)
 	if assert.Nil(t, err) {
@@ -337,7 +337,7 @@ func TestAnswerGetByQuestionIDCorrectData(t *testing.T) {
 	createdAnswers := make([]model.Answer, 0)
 	createdAnswers = append(createdAnswers, createdAnswer)
 	createdAnswers = append(createdAnswers, createdAnswer)
-	cMock.On("GetAnswersByQuestionID", 1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByQuestionID", 1, -1, -1).Return(createdAnswers, nil)
 
 	err := client.Do(req, res)
 	if assert.Nil(t, err) {
@@ -369,7 +369,7 @@ func TestAnswerGetByQuestionIDNotFound(t *testing.T) {
 	req.Header.SetMethod("GET")
 
 	createdAnswers := make([]model.Answer, 0)
-	cMock.On("GetAnswersByQuestionID", 1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByQuestionID", 1, -1, -1).Return(createdAnswers, nil)
 
 	err := client.Do(req, res)
 	if assert.Nil(t, err) {

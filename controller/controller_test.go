@@ -40,12 +40,12 @@ func (s *MockedAService) GetAnswerByID(qID int) (model.Answer, error) {
 	args := s.Mock.Called(qID)
 	return args.Get(0).(model.Answer), args.Error(1)
 }
-func (s *MockedAService) GetAnswersByAuthorID(qAuthorID int) ([]model.Answer, error) {
-	args := s.Mock.Called(qAuthorID)
+func (s *MockedAService) GetAnswersByAuthorID(aAuthorID int, limit int, offset int) ([]model.Answer, error) {
+	args := s.Mock.Called(aAuthorID, limit, offset)
 	return args.Get(0).([]model.Answer), args.Error(1)
 }
-func (s *MockedAService) GetAnswersByQuestionID(qAuthorID int) ([]model.Answer, error) {
-	args := s.Mock.Called(qAuthorID)
+func (s *MockedAService) GetAnswersByQuestionID(aQuestionID int, limit int, offset int) ([]model.Answer, error) {
+	args := s.Mock.Called(aQuestionID, limit, offset)
 	return args.Get(0).([]model.Answer), args.Error(1)
 }
 func (s *MockedAService) UpdateAnswer(a model.Answer) (model.Answer, error) {
@@ -180,9 +180,9 @@ func TestAnswerGetByAuthorIDCorrectData(t *testing.T) {
 	createdAnswers := make([]model.Answer, 0)
 	createdAnswers = append(createdAnswers, createdAnswer)
 	createdAnswers = append(createdAnswers, createdAnswer)
-	cMock.On("GetAnswersByAuthorID", 1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByAuthorID", 1, -1, -1).Return(createdAnswers, nil)
 
-	data, err := AnswersGET("1", "author")
+	data, err := AnswersGET("1", "author", -1, -1)
 	if assert.Nil(t, err) {
 		cMock.AssertExpectations(t)
 		assert.Equal(t, 2, len(data))
@@ -201,9 +201,9 @@ func TestAnswerGetByAuthorIDNotFound(t *testing.T) {
 	cMock := getMock()
 
 	createdAnswers := make([]model.Answer, 0)
-	cMock.On("GetAnswersByAuthorID", 1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByAuthorID", 1, -1, -1).Return(createdAnswers, nil)
 
-	data, err := AnswersGET("1", "author")
+	data, err := AnswersGET("1", "author", -1, -1)
 	if assert.Nil(t, err) {
 		cMock.AssertExpectations(t)
 
@@ -218,9 +218,9 @@ func TestAnswerGetByQuestionIDCorrectData(t *testing.T) {
 	createdAnswers := make([]model.Answer, 0)
 	createdAnswers = append(createdAnswers, createdAnswer)
 	createdAnswers = append(createdAnswers, createdAnswer)
-	cMock.On("GetAnswersByQuestionID", 1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByQuestionID", 1, -1, -1).Return(createdAnswers, nil)
 
-	data, err := AnswersGET("1", "question")
+	data, err := AnswersGET("1", "question", -1, -1)
 	if assert.Nil(t, err) {
 		cMock.AssertExpectations(t)
 		assert.Equal(t, 2, len(data))
@@ -239,9 +239,9 @@ func TestAnswerGetByQuestionIDNotFound(t *testing.T) {
 	cMock := getMock()
 
 	createdAnswers := make([]model.Answer, 0)
-	cMock.On("GetAnswersByQuestionID", 1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByQuestionID", 1, -1, -1).Return(createdAnswers, nil)
 
-	data, err := AnswersGET("1", "question")
+	data, err := AnswersGET("1", "question", -1, -1)
 	if assert.Nil(t, err) {
 		cMock.AssertExpectations(t)
 

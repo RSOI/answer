@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/RSOI/answer/controller"
 	"github.com/RSOI/answer/ui"
@@ -71,7 +72,15 @@ func answersAuthorGET(ctx *fasthttp.RequestCtx) {
 	var r ui.Response
 
 	aid := ctx.UserValue("authorid").(string)
-	r.Data, err = controller.AnswersGET(aid, "author")
+	limit := ctx.QueryArgs().Peek("limit")
+	offset := ctx.QueryArgs().Peek("limit")
+	l := 0
+	o := 0
+	if len(limit) > 0 && len(offset) > 0 {
+		l, err = strconv.Atoi(string(limit))
+		o, err = strconv.Atoi(string(offset))
+	}
+	r.Data, err = controller.AnswersGET(aid, "author", l, o)
 	r.Status, r.Error = ui.ErrToResponse(err)
 	sendResponse(ctx, r)
 }
@@ -82,7 +91,15 @@ func answersQuestionGET(ctx *fasthttp.RequestCtx) {
 	var r ui.Response
 
 	qid := ctx.UserValue("questionid").(string)
-	r.Data, err = controller.AnswersGET(qid, "question")
+	page := ctx.QueryArgs().Peek("page")
+	countOnPage := ctx.QueryArgs().Peek("conp")
+	p := 0
+	c := 0
+	if len(page) > 0 && len(countOnPage) > 0 {
+		p, err = strconv.Atoi(string(page))
+		c, err = strconv.Atoi(string(countOnPage))
+	}
+	r.Data, err = controller.AnswersGET(qid, "question", c, (p-1)*c)
 	r.Status, r.Error = ui.ErrToResponse(err)
 	sendResponse(ctx, r)
 }
