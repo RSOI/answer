@@ -66,25 +66,28 @@ var (
 	updatedAnswerIsBest         = true
 	defaultAnswerCreatedTime, _ = time.Parse("2006-01-02T15:04:05", time.Now().String())
 	defaultAnswer               = model.Answer{
-		AuthorID:   1,
-		QuestionID: 1,
-		Content:    &defaultAnswerContent,
+		AuthorID:       1,
+		AuthorNickname: "Test",
+		QuestionID:     1,
+		Content:        &defaultAnswerContent,
 	}
 	createdAnswer = model.Answer{
-		ID:         1,
-		AuthorID:   1,
-		QuestionID: 1,
-		Content:    &defaultAnswerContent,
-		IsBest:     &defaultAnswerIsBest,
-		Created:    defaultAnswerCreatedTime,
+		ID:             1,
+		AuthorID:       1,
+		AuthorNickname: "Test",
+		QuestionID:     1,
+		Content:        &defaultAnswerContent,
+		IsBest:         &defaultAnswerIsBest,
+		Created:        defaultAnswerCreatedTime,
 	}
 	updatedAnswer = model.Answer{
-		ID:         1,
-		AuthorID:   1,
-		QuestionID: 1,
-		Content:    &defaultAnswerContent,
-		IsBest:     &updatedAnswerIsBest,
-		Created:    defaultAnswerCreatedTime,
+		ID:             1,
+		AuthorID:       1,
+		AuthorNickname: "Test",
+		QuestionID:     1,
+		Content:        &defaultAnswerContent,
+		IsBest:         &updatedAnswerIsBest,
+		Created:        defaultAnswerCreatedTime,
 	}
 	answerToRemoveID = model.Answer{
 		ID: 1,

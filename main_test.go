@@ -68,25 +68,28 @@ var (
 	updatedAnswerIsBest         = true
 	defaultAnswerCreatedTime, _ = time.Parse("2006-01-02T15:04:05", time.Now().String())
 	defaultAnswer               = model.Answer{
-		AuthorID:   1,
-		QuestionID: 1,
-		Content:    &defaultAnswerContent,
+		AuthorID:       1,
+		AuthorNickname: "Test",
+		QuestionID:     1,
+		Content:        &defaultAnswerContent,
 	}
 	createdAnswer = model.Answer{
-		ID:         1,
-		AuthorID:   1,
-		QuestionID: 1,
-		Content:    &defaultAnswerContent,
-		IsBest:     &defaultAnswerIsBest,
-		Created:    defaultAnswerCreatedTime,
+		ID:             1,
+		AuthorID:       1,
+		AuthorNickname: "Test",
+		QuestionID:     1,
+		Content:        &defaultAnswerContent,
+		IsBest:         &defaultAnswerIsBest,
+		Created:        defaultAnswerCreatedTime,
 	}
 	updatedAnswer = model.Answer{
-		ID:         1,
-		AuthorID:   1,
-		QuestionID: 1,
-		Content:    &defaultAnswerContent,
-		IsBest:     &updatedAnswerIsBest,
-		Created:    defaultAnswerCreatedTime,
+		ID:             1,
+		AuthorID:       1,
+		AuthorNickname: "Test",
+		QuestionID:     1,
+		Content:        &defaultAnswerContent,
+		IsBest:         &updatedAnswerIsBest,
+		Created:        defaultAnswerCreatedTime,
 	}
 )
 
@@ -273,7 +276,7 @@ func TestAnswerGetByAuthorIDCorrectData(t *testing.T) {
 	createdAnswers := make([]model.Answer, 0)
 	createdAnswers = append(createdAnswers, createdAnswer)
 	createdAnswers = append(createdAnswers, createdAnswer)
-	cMock.On("GetAnswersByAuthorID", 1, -1, -1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByAuthorID", 1, 0, 0).Return(createdAnswers, nil)
 
 	err := client.Do(req, res)
 	if assert.Nil(t, err) {
@@ -305,7 +308,7 @@ func TestAnswerGetByAuthorIDNotFound(t *testing.T) {
 	req.Header.SetMethod("GET")
 
 	createdAnswers := make([]model.Answer, 0)
-	cMock.On("GetAnswersByAuthorID", 1, -1, -1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByAuthorID", 1, 0, 0).Return(createdAnswers, nil)
 
 	err := client.Do(req, res)
 	if assert.Nil(t, err) {
@@ -337,7 +340,7 @@ func TestAnswerGetByQuestionIDCorrectData(t *testing.T) {
 	createdAnswers := make([]model.Answer, 0)
 	createdAnswers = append(createdAnswers, createdAnswer)
 	createdAnswers = append(createdAnswers, createdAnswer)
-	cMock.On("GetAnswersByQuestionID", 1, -1, -1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByQuestionID", 1, 0, 0).Return(createdAnswers, nil)
 
 	err := client.Do(req, res)
 	if assert.Nil(t, err) {
@@ -369,7 +372,7 @@ func TestAnswerGetByQuestionIDNotFound(t *testing.T) {
 	req.Header.SetMethod("GET")
 
 	createdAnswers := make([]model.Answer, 0)
-	cMock.On("GetAnswersByQuestionID", 1, -1, -1).Return(createdAnswers, nil)
+	cMock.On("GetAnswersByQuestionID", 1, 0, 0).Return(createdAnswers, nil)
 
 	err := client.Do(req, res)
 	if assert.Nil(t, err) {
